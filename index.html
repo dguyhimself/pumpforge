@@ -558,6 +558,76 @@
                 color: var(--text-primary);
                 text-decoration: none;
             }
+            /* Header Tagline Styles */
+            /* --- Brand Column & Tagline Styles --- */
+            /* --- Brand Identity Styles (Add/Replace) --- */
+            .header-brand-container {
+                display: flex;
+                align-items: center;
+                gap: 12px; /* Space between Icon and Text stack */
+                text-decoration: none;
+                cursor: pointer;
+            }
+
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                stroke: var(--accent-green);
+                flex-shrink: 0;
+            }
+
+            .brand-text-stack {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                line-height: 1.1; /* Tighter line height for the stack */
+            }
+
+            .brand-name {
+                font-size: 1.5rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                letter-spacing: -0.5px;
+            }
+
+            .brand-tagline {
+                font-size: 0.8rem;
+                color: #cecece; /* Brighter gray for better readability */
+                font-weight: 500;
+                letter-spacing: 0.2px;
+                margin-top: 5px;
+            }
+
+            /* Mobile: Scale down slightly but keep visible */
+            @media (max-width: 768px) {
+                .header-brand-container {
+                    gap: 8px;
+                }
+                .brand-name {
+                    font-size: 1.25rem;
+                }
+                .brand-tagline {
+                    font-size: 0.7rem;
+                }
+                .logo-icon {
+                    width: 28px;
+                    height: 28px;
+                }
+            }
+
+            /* Mobile Optimization: Scale down slightly to fit */
+            @media (max-width: 768px) {
+                .header-tagline {
+                    font-size: 0.65rem;
+                    white-space: normal; /* Allow wrapping if screen is tiny */
+                    line-height: 1.2;
+                    max-width: 220px;
+                }
+                
+                .brand-column {
+                    gap: 2px;
+                }
+            }
 
             .header-nav {
                 display: flex;
@@ -2385,6 +2455,96 @@
             body.tour-active {
                 overflow: hidden;
             }
+            /* Add this to your CSS */
+            /* UPDATED CSS - Add/Replace this in your <style> */
+            .input-helper {
+                font-size: 0.8rem;
+                color: var(--text-tertiary); /* Uniform gray color */
+                margin-top: 6px;
+                line-height: 1.4;
+                font-weight: 400; /* Regular weight to reduce distraction */
+            }
+            /* This ensures bold text is just bold, not brighter */
+            .input-helper strong {
+                color: inherit; 
+                font-weight: 600;
+            }
+            .input-helper a {
+                color: var(--accent-green); /* Links still need to look clickable */
+                text-decoration: none;
+                border-bottom: 1px dotted var(--accent-green);
+            }
+            .input-helper a:hover {
+                border-bottom-style: solid;
+            }
+            .badge-recommended {
+                background: rgba(255, 184, 0, 0.1);
+                color: #ffb800;
+                font-size: 0.7rem;
+                padding: 2px 6px;
+                border-radius: 4px;
+                margin-left: 6px;
+                border: 1px solid rgba(255, 184, 0, 0.2);
+            }
+            .section-footer-link {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 6px;
+                margin-top: 24px;
+                padding-top: 16px;
+                border-top: 1px solid var(--border-color);
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: color 0.2s;
+            }
+            .section-footer-link:hover {
+                color: var(--accent-green);
+            }
+            /* Add/Update these in your <style> block */
+            .pro-tip-box {
+                background: rgba(37, 195, 142, 0.08);
+                border-left: 3px solid var(--accent-green);
+                padding: 16px;
+                border-radius: 0 8px 8px 0;
+                margin-top: 20px;
+                font-size: 0.9rem;
+            }
+            .pro-tip-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-weight: 700;
+                color: var(--accent-green);
+                margin-bottom: 8px;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+            }
+            .resource-links {
+                display: flex;
+                gap: 12px;
+                margin-top: 12px;
+                flex-wrap: wrap;
+            }
+            .resource-pill {
+                background: var(--background-secondary);
+                border: 1px solid var(--border-color);
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+            .resource-pill:hover {
+                border-color: var(--accent-green);
+                color: var(--text-primary);
+            }
         </style>
     </head>
     <!-- Add this right before </body> -->
@@ -2542,43 +2702,26 @@
         <div class="app-container">
             <header class="main-header">
                 <div class="header-left">
-                    <a href="#" id="logo-link" class="header-logo"
-                        ><svg
-                            class="icon"
-                            style="
-                                width: 28px;
-                                height: 28px;
-                                stroke: var(--accent-green);
-                            "
-                        >
-                            <use xlink:href="#icon-forge"></use></svg
-                        >PumpForge</a
-                    >
+                    <!-- New Brand Structure -->
+                    <a href="#" id="logo-link" class="header-brand-container">
+                        <!-- Icon sits on the left -->
+                        <svg class="icon logo-icon">
+                            <use xlink:href="#icon-forge"></use>
+                        </svg>
+                        
+                        <!-- Text stacks on the right -->
+                        <div class="brand-text-stack">
+                            <span class="brand-name">PumpForge</span>
+                            <span class="brand-tagline">Launch with an edge</span>
+                        </div>
+                    </a>
+                
+                    <!-- Navigation -->
                     <nav class="header-nav" id="main-nav">
-                        <a
-                            href="#create"
-                            data-page="create-coin-section"
-                            class="nav-link active-nav"
-                            >Create Coin</a
-                        >
-                        <a
-                            href="#about"
-                            data-page="about-section"
-                            class="nav-link"
-                            >About</a
-                        >
-                        <a
-                            href="#how-it-works"
-                            data-page="how-it-works-section"
-                            class="nav-link"
-                            >How It Works</a
-                        >
-                        <a
-                            href="#fees"
-                            data-page="fees-section"
-                            class="nav-link"
-                            >Fees</a
-                        >
+                        <a href="#create" data-page="create-coin-section" class="nav-link active-nav">Create Coin</a>
+                        <a href="#about" data-page="about-section" class="nav-link">About</a>
+                        <a href="#how-it-works" data-page="how-it-works-section" class="nav-link">How It Works</a>
+                        <a href="#fees" data-page="fees-section" class="nav-link">Fees</a>
                     </nav>
                 </div>
                 <div class="header-right">
@@ -2704,65 +2847,42 @@
                             <h2>Coin Details</h2>
                             <div class="input-group">
                                 <div class="input-field">
-                                    <label for="coin-name">Coin name</label
-                                    ><input
-                                        type="text"
-                                        id="coin-name"
-                                        class="required-input"
-                                        placeholder="Name your coin"
-                                    />
+                                    <label for="coin-name">Coin name</label>
+                                    <input type="text" id="coin-name" class="required-input" placeholder="e.g. Galactic Pepe">
+                                    <div class="input-helper">Choose a unique, meme-able name. Avoid generic titles.</div>
                                 </div>
                                 <div class="input-field">
-                                    <label for="ticker">Ticker</label
-                                    ><input
-                                        type="text"
-                                        id="ticker"
-                                        class="required-input"
-                                        placeholder="e.g. FORGE"
-                                    />
+                                    <label for="ticker">Ticker</label>
+                                    <input type="text" id="ticker" class="required-input" placeholder="e.g. GPEPE">
+                                    <div class="input-helper">3-5 letters. This is your tag on Raydium.</div>
                                 </div>
                             </div>
                             <div class="input-field">
-                                <label for="description">Description</label
-                                ><textarea
-                                    id="description"
-                                    placeholder="A short, effective description of your coin."
-                                ></textarea>
+                                <label for="description">Description</label>
+                                <textarea id="description" placeholder="A short, effective description of your coin."></textarea>
+                                <div class="input-helper">Narrative keywords drive algo discovery. Keep it punchy.</div>
                             </div>
                             <div class="dropdown-toggle" id="socials-toggle">
                                 <svg class="icon">
                                     <use xlink:href="#icon-link"></use>
                                 </svg>
-                                <span
-                                    >Add social links<span
-                                        class="label-optional"
-                                        >(Optional)</span
-                                    ></span
-                                >
+                                <span>Add social links <span class="badge-recommended">Recommended</span></span>
                                 <svg class="icon arrow-down">
                                     <use xlink:href="#icon-arrow-down"></use>
                                 </svg>
                             </div>
                             <div class="dropdown-content" id="socials-content">
+                                <p class="feature-description" style="margin-bottom: 15px;">Projects with socials verify 400% faster.</p>
                                 <div class="input-group">
                                     <div class="input-field">
-                                        <label>Website</label
-                                        ><input
-                                            type="text"
-                                            placeholder="Add URL"
-                                        />
+                                        <label>Website</label><input type="text" placeholder="https://yourcoin.com" />
                                     </div>
                                     <div class="input-field">
-                                        <label>Twitter / X</label
-                                        ><input
-                                            type="text"
-                                            placeholder="Add URL"
-                                        />
+                                        <label>Twitter / X</label><input type="text" placeholder="https://x.com/yourcoin" />
                                     </div>
                                 </div>
                                 <div class="input-field">
-                                    <label>Telegram</label
-                                    ><input type="text" placeholder="Add URL" />
+                                    <label>Telegram</label><input type="text" placeholder="https://t.me/yourcoin" />
                                 </div>
                             </div>
                         </div>
@@ -2770,67 +2890,35 @@
                         <div class="form-section">
                             <h2>Media</h2>
                             <div class="uploader" id="main-uploader">
-                                <input
-                                    type="file"
-                                    id="main-file-input"
-                                    class="file-input required-input"
-                                    accept="image/*,video/mp4"
-                                />
+                                <input type="file" id="main-file-input" class="file-input required-input" accept="image/*,video/mp4" />
                                 <div class="uploader-content">
                                     <svg class="uploader-icon">
                                         <use xlink:href="#icon-image"></use>
                                     </svg>
                                     <p>Select video or image to upload</p>
-                                    <button
-                                        type="button"
-                                        class="select-file-btn"
-                                    >
-                                        Select file
-                                    </button>
+                                    <button type="button" class="select-file-btn">Select file</button>
                                 </div>
                                 <div class="media-preview-container">
-                                    <img
-                                        class="media-preview"
-                                        id="image-preview"
-                                        src=""
-                                        alt="Image preview"
-                                    /><video
-                                        class="media-preview"
-                                        id="video-preview"
-                                        autoplay
-                                        loop
-                                        muted
-                                        playsinline
-                                        src=""
-                                    ></video>
+                                    <img class="media-preview" id="image-preview" src="" alt="Image preview" /><video class="media-preview" id="video-preview" autoplay loop muted playsinline src=""></video>
                                 </div>
-                                <button type="button" class="replace-file-btn">
-                                    Replace
-                                </button>
+                                <button type="button" class="replace-file-btn">Replace</button>
+                            </div>
+                            <div class="input-helper" style="justify-content: center; margin-top: 12px;">
+                                Need a logo? Try <a href="https://www.canva.com/create/logos/" target="_blank">Canva</a> or <a href="https://looka.com/" target="_blank">Looka</a>. High-quality art signals a serious dev.
                             </div>
                             <div class="file-info-container">
                                 <div class="file-info">
-                                    <svg class="icon">
-                                        <use xlink:href="#icon-file"></use>
-                                    </svg>
+                                    <svg class="icon"><use xlink:href="#icon-file"></use></svg>
                                     <div>
                                         <h4>File type</h4>
-                                        <ul>
-                                            <li>JPG, PNG, GIF (max 15mb)</li>
-                                        </ul>
+                                        <ul><li>JPG, PNG, GIF (max 15mb)</li></ul>
                                     </div>
                                 </div>
                                 <div class="file-info">
-                                    <svg class="icon">
-                                        <use
-                                            xlink:href="#icon-aspect-ratio"
-                                        ></use>
-                                    </svg>
+                                    <svg class="icon"><use xlink:href="#icon-aspect-ratio"></use></svg>
                                     <div>
                                         <h4>Aspect ratio</h4>
-                                        <ul>
-                                            <li>1:1 square (1000x1000px)</li>
-                                        </ul>
+                                        <ul><li>1:1 square (1000x1000px)</li></ul>
                                     </div>
                                 </div>
                             </div>
@@ -2838,274 +2926,131 @@
 
                         <div class="form-section">
                             <h2>Launch & Pump Configuration</h2>
-
+                            <p class="feature-description" style="margin-bottom: 24px;">
+                                Define your market entry parameters. These settings control the initial velocity of your token.
+                            </p>
+                        
                             <div class="input-field slider-field">
                                 <div class="slider-header">
-                                    <label>Dev Initial Buy</label
-                                    ><span id="dev-buy-value">2.5 SOL</span>
+                                    <label>Dev Initial Buy</label><span id="dev-buy-value">2.5 SOL</span>
                                 </div>
-                                <input
-                                    type="range"
-                                    id="dev-buy-slider"
-                                    min="0.1"
-                                    max="12.5"
-                                    step="0.1"
-                                    value="2.5"
-                                    class="custom-slider"
-                                />
+                                <input type="range" id="dev-buy-slider" min="0.1" max="12.5" step="0.1" value="2.5" class="custom-slider" />
+                                <div class="input-helper">High dev holdings signal confidence to early buyers.</div>
                             </div>
-
+                        
                             <div class="input-field slider-field">
                                 <div class="slider-header">
-                                    <label>Total Pump Amount</label
-                                    ><span id="sol-value">5.0 SOL</span>
+                                    <label>Total Pump Amount</label><span id="sol-value">5.0 SOL</span>
                                 </div>
-                                <input
-                                    type="range"
-                                    id="total-sol-slider"
-                                    min="0.1"
-                                    max="10.0"
-                                    step="0.1"
-                                    value="5"
-                                    class="custom-slider"
-                                />
+                                <input type="range" id="total-sol-slider" min="0.1" max="10.0" step="0.1" value="5" class="custom-slider" />
+                                <div class="input-helper">Total SOL used for volume. Higher volume = higher chart ranking.</div>
                             </div>
-
+                        
                             <div class="input-field slider-field">
                                 <div class="slider-header">
-                                    <label>Pump Wallets</label
-                                    ><span id="wallets-value">10 Wallets</span>
+                                    <label>Pump Wallets</label><span id="wallets-value">10 Wallets</span>
                                 </div>
-                                <input
-                                    type="range"
-                                    id="pump-wallets-slider"
-                                    min="1"
-                                    max="25"
-                                    value="10"
-                                    class="custom-slider"
-                                />
+                                <input type="range" id="pump-wallets-slider" min="1" max="25" value="10" class="custom-slider" />
+                                <div class="input-helper">More wallets creates a more organic holder distribution.</div>
                             </div>
-
+                        
                             <div class="input-field" style="margin-top: 24px; margin-bottom: 15px;">
                                 <label>Pump Distribution Profile</label>
-                                <div
-                                    class="pump-btn-group"
-                                    id="profile-btn-group"
-                                >
-                                    <button
-                                        class="btn active"
-                                        data-profile="fixed"
-                                    >
-                                        Fixed
-                                    </button>
-                                    <button class="btn" data-profile="random">
-                                        Random
-                                    </button>
+                                <div class="pump-btn-group" id="profile-btn-group">
+                                    <button class="btn active" data-profile="fixed">Fixed</button>
+                                    <button class="btn" data-profile="random">Random</button>
                                 </div>
-                                <p
-                                    class="feature-description"
-                                    id="profile-description"
-                                ></p>
+                                <!-- This paragraph is populated by your JS script, as requested -->
+                                <p class="feature-description" id="profile-description"></p>
                             </div>
-                            <div
-                                class="summary-display"
-                                id="est-sol-per-wallet-display"
-                            >
+                        
+                            <div class="summary-display" id="est-sol-per-wallet-display">
                                 <div class="summary-row">
-                                    <span>Est. SOL per Wallet</span
-                                    ><span id="sol-per-wallet-value"
-                                        >0.50 SOL</span
-                                    >
+                                    <span>Est. SOL per Wallet</span><span id="sol-per-wallet-value">0.50 SOL</span>
                                 </div>
                             </div>
-
-
-                            <div
-                                class="summary-display"
-                                id="total-cost-display"
-                            >
+                        
+                            <div class="summary-display" id="total-cost-display">
                                 <div class="summary-row">
-                                    <span>Total</span
-                                    ><span id="total-cost-value">7.50 SOL</span>
+                                    <span>Total Cost</span><span id="total-cost-value">7.50 SOL</span>
                                 </div>
                             </div>
-
+                        
                             <div class="dropdown-toggle" id="advanced-toggle">
-                                <svg class="icon">
-                                    <use xlink:href="#icon-sliders"></use>
-                                </svg>
+                                <svg class="icon"><use xlink:href="#icon-sliders"></use></svg>
                                 <span>Advanced Configuration</span>
-                                <span
-                                    class="status-dot"
-                                    id="adv-status-dot"
-                                ></span>
-                                <svg class="icon arrow-down">
-                                    <use xlink:href="#icon-arrow-down"></use>
-                                </svg>
+                                <span class="status-dot" id="adv-status-dot"></span>
+                                <svg class="icon arrow-down"><use xlink:href="#icon-arrow-down"></use></svg>
                             </div>
-
+                        
                             <div class="dropdown-content" id="advanced-content">
-                                <div
-                                    class="adv-feature-module"
-                                    id="first-mover-module"
-                                >
+                                <!-- Advanced modules (First Mover, Dip Buyer, Ghost) remain unchanged -->
+                                <div class="adv-feature-module" id="first-mover-module">
                                     <div class="adv-feature-header">
                                         <h4>First Mover Advantage</h4>
-                                        <label class="switch"
-                                            ><input
-                                                type="checkbox"
-                                                class="adv-toggle" /><span
-                                                class="slider"
-                                            ></span
-                                        ></label>
+                                        <label class="switch"><input type="checkbox" class="adv-toggle" /><span class="slider"></span></label>
                                     </div>
-                                    <p
-                                        class="feature-description"
-                                        style="margin-top: 4px"
-                                    >
-                                        An additional buy to signal momentum.
-                                        This is added to your total cost.
-                                    </p>
+                                    <p class="feature-description" style="margin-top: 4px">Additional buy executed in the deployment block to signal momentum.</p>
                                     <div class="adv-feature-content">
-                                        <div class="slider-field">
+                                         <div class="slider-field">
                                             <div class="slider-header">
-                                                <label>First Buy Amount</label
-                                                ><span id="first-buy-sol-value"
-                                                    >1.0 SOL</span
-                                                >
+                                                <label>First Buy Amount</label><span id="first-buy-sol-value">1.0 SOL</span>
                                             </div>
-                                            <input
-                                                type="range"
-                                                id="first-buy-sol-slider"
-                                                min="0.1"
-                                                max="5"
-                                                value="1"
-                                                step="0.1"
-                                                class="custom-slider"
-                                            />
+                                            <input type="range" id="first-buy-sol-slider" min="0.1" max="5" value="1" step="0.1" class="custom-slider" />
                                         </div>
                                         <div class="slider-field">
                                             <div class="slider-header">
-                                                <label>First Buy Delay</label
-                                                ><span
-                                                    id="first-buy-delay-value"
-                                                    >3 sec</span
-                                                >
+                                                <label>First Buy Delay</label><span id="first-buy-delay-value">3 sec</span>
                                             </div>
-                                            <input
-                                                type="range"
-                                                id="first-buy-delay-slider"
-                                                min="0"
-                                                max="30"
-                                                value="3"
-                                                step="1"
-                                                class="custom-slider"
-                                            />
+                                            <input type="range" id="first-buy-delay-slider" min="0" max="30" value="3" step="1" class="custom-slider" />
                                         </div>
                                     </div>
                                 </div>
-                                <div
-                                    class="adv-feature-module"
-                                    id="dip-buyer-module"
-                                >
+                                
+                                <div class="adv-feature-module" id="dip-buyer-module">
                                     <div class="adv-feature-header">
                                         <h4>Dip Buyer AI</h4>
-                                        <label class="switch"
-                                            ><input
-                                                type="checkbox"
-                                                class="adv-toggle" /><span
-                                                class="slider"
-                                            ></span
-                                        ></label>
+                                        <label class="switch"><input type="checkbox" class="adv-toggle" /><span class="slider"></span></label>
                                     </div>
-                                    <p
-                                        class="feature-description"
-                                        style="margin-top: 4px"
-                                    >
-                                        Automatically uses reserved wallets to
-                                        buy dips and defend the price floor.
-                                    </p>
-                                    <div class="adv-feature-content">
-                                        <div class="slider-field">
+                                    <p class="feature-description">Automatically defends the price floor using reserved wallets.</p>
+                                     <div class="adv-feature-content">
+                                         <div class="slider-field">
                                             <div class="slider-header">
-                                                <label>Defendable Wallets</label
-                                                ><span id="dip-wallets-value"
-                                                    >3 Wallets</span
-                                                >
+                                                <label>Defendable Wallets</label><span id="dip-wallets-value">3 Wallets</span>
                                             </div>
-                                            <input
-                                                type="range"
-                                                id="dip-wallets-slider"
-                                                min="0"
-                                                max="10"
-                                                value="3"
-                                                step="1"
-                                                class="custom-slider"
-                                            />
+                                            <input type="range" id="dip-wallets-slider" min="0" max="10" value="3" step="1" class="custom-slider" />
                                         </div>
                                         <div class="slider-field">
                                             <div class="slider-header">
-                                                <label>Buy Trigger Drop</label
-                                                ><span id="dip-trigger-value"
-                                                    >15%</span
-                                                >
+                                                <label>Buy Trigger Drop</label><span id="dip-trigger-value">15%</span>
                                             </div>
-                                            <input
-                                                type="range"
-                                                id="dip-trigger-slider"
-                                                min="5"
-                                                max="50"
-                                                value="15"
-                                                step="1"
-                                                class="custom-slider"
-                                            />
+                                            <input type="range" id="dip-trigger-slider" min="5" max="50" value="15" step="1" class="custom-slider" />
                                         </div>
-                                    </div>
+                                     </div>
                                 </div>
-                                <div
-                                    class="adv-feature-module"
-                                    id="ghost-protocol-module"
-                                >
+                        
+                                <div class="adv-feature-module" id="ghost-protocol-module">
                                     <div class="adv-feature-header">
                                         <h4>Ghost Protocol</h4>
-                                        <label class="switch"
-                                            ><input
-                                                type="checkbox"
-                                                class="adv-toggle" /><span
-                                                class="slider"
-                                            ></span
-                                        ></label>
+                                        <label class="switch"><input type="checkbox" class="adv-toggle" /><span class="slider"></span></label>
                                     </div>
-                                    <p
-                                        class="feature-description"
-                                        style="margin-top: 4px"
-                                    >
-                                        Hides pump activity by making wallet
-                                        funding and transactions look organic.
-                                    </p>
-                                    <div class="adv-feature-content">
+                                    <p class="feature-description">Obfuscates wallet funding and transactions to look organic.</p>
+                                     <div class="adv-feature-content">
                                         <div class="ghost-protocol-sub-feature">
-                                            <span class="label"
-                                                >Staggered Wallet Funding</span
-                                            ><label class="switch"
-                                                ><input type="checkbox" /><span
-                                                    class="slider"
-                                                ></span
-                                            ></label>
+                                            <span class="label">Staggered Wallet Funding</span><label class="switch"><input type="checkbox" /><span class="slider"></span></label>
                                         </div>
                                         <div class="ghost-protocol-sub-feature">
-                                            <span class="label"
-                                                >Multi-Tier Funding
-                                                Cascade</span
-                                            ><label class="switch"
-                                                ><input type="checkbox" /><span
-                                                    class="slider"
-                                                ></span
-                                            ></label>
+                                            <span class="label">Multi-Tier Funding Cascade</span><label class="switch"><input type="checkbox" /><span class="slider"></span></label>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        
+                            <!-- NEW: How It Works Link -->
+                            <a href="#how-it-works" class="section-footer-link" data-page="how-it-works-section">
+                                <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#icon-info-circle"></use></svg>
+                                <span>Confused? Read the Strategy Guide</span>
+                            </a>
                         </div>
 
                         <button
@@ -3268,69 +3213,83 @@
                 </div>
 
                 <div class="steps-container">
-                    
-                    <!-- Step 1 -->
+    
+                    <!-- Step 1: Funding -->
                     <div class="step-card">
                         <div class="step-text">
-                            <div class="step-badge">01</div>
-                            <h3>Initialize & Fund</h3>
+                            <div class="step-badge">Phase 1</div>
+                            <h3>Secure Environment Setup</h3>
                             <p>
-                                Generate a fresh, ephemeral "Dev Wallet" directly in the app. This isolates your main assets 
-                                from the launch process. 
+                                Launches fail because of linked wallets. PumpForge generates a fresh, ephemeral <strong>Dev Wallet</strong> locally. 
+                                This isolates your main assets and prevents "wallet bubbling" (trackers linking your dev wallet to your pump wallets).
                             </p>
-                            <div class="strategy-tip">
-                                <svg class="icon"><use xlink:href="#icon-info-circle"></use></svg>
-                                <span><strong>Strategy Tip:</strong> We recommend funding with at least <strong>5-10 SOL</strong> to cover the Dev Buy, pump wallets, and network fees without hitting transaction limits.</span>
+                            <div class="pro-tip-box">
+                                <div class="pro-tip-header">
+                                    <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#icon-info-circle"></use></svg>
+                                    Capital Strategy
+                                </div>
+                                <p>We recommend funding <strong>7-10 SOL</strong>. This covers the initial Dev Buy, funds 10+ pump wallets, and pays for the "Ghost Protocol" gas fees without hitting transaction limits.</p>
                             </div>
                         </div>
                         <div class="step-visual">
-                            <!-- CSS Mock UI: Wallet Header -->
+                            <!-- Mock UI: Wallet -->
                             <div class="mock-ui-header">
-                                <div class="mock-dot"></div>
-                                <div class="mock-line" style="width: 60%"></div>
+                                <div class="mock-dot"></div><div class="mock-line" style="width: 60%"></div>
                             </div>
                             <div class="mock-ui-body">
                                 <div class="mock-balance">7.50 SOL</div>
-                                <div class="mock-btn">Withdraw</div>
+                                <div class="mock-btn">System Ready</div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Step 2 -->
+                
+                    <!-- Step 2: Identity -->
                     <div class="step-card reverse">
                         <div class="step-text">
-                            <div class="step-badge">02</div>
-                            <h3>Configure Identity</h3>
+                            <div class="step-badge">Phase 2</div>
+                            <h3>High-Fidelity Branding</h3>
                             <p>
-                                Upload your visual assets and define your metadata. This is immutable once deployed. 
-                                A strong ticker and clean image are essential for social verification.
+                                In the "attention economy," your ticker and visual assets are your only leverage. 
+                                Generic memes die in seconds. Use these tools to create professional assets that signal a "long-term hold" to buyers.
                             </p>
+                            <div class="resource-links">
+                                <a href="https://chat.openai.com/" target="_blank" class="resource-pill">
+                                    <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#icon-link"></use></svg> ChatGPT (Narratives)
+                                </a>
+                                <a href="https://www.midjourney.com/" target="_blank" class="resource-pill">
+                                    <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#icon-image"></use></svg> Midjourney (Art)
+                                </a>
+                                <a href="https://looka.com/" target="_blank" class="resource-pill">
+                                    <svg class="icon" style="width:14px;height:14px;"><use xlink:href="#icon-forge"></use></svg> Looka (Logos)
+                                </a>
+                            </div>
                         </div>
                         <div class="step-visual">
-                            <!-- CSS Mock UI: Upload Box -->
                             <div class="mock-uploader">
                                 <svg class="icon"><use xlink:href="#icon-image"></use></svg>
                                 <div class="mock-line" style="width: 40%; height: 8px; margin: 10px auto;"></div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Step 3 -->
+                
+                    <!-- Step 3: Distribution Strategy -->
                     <div class="step-card">
                         <div class="step-text">
-                            <div class="step-badge">03</div>
-                            <h3>Define Launch Strategy</h3>
+                            <div class="step-badge">Phase 3</div>
+                            <h3>Volume & Distribution Engineering</h3>
                             <p>
-                                This is where you win. Use the sliders to allocate your total SOL between your 
-                                <strong>Dev Holding</strong> (the supply you keep) and the <strong>Pump Wallets</strong> (the initial volume).
+                                This is where you configure the <strong>PumpForge Engine</strong>. You aren't just buying; you are painting a chart structure.
                             </p>
                             <ul class="strategy-list">
-                                <li><strong>The "Whale" Strategy:</strong> High Dev Buy (10+ SOL), Low Pump. Signals massive confidence.</li>
-                                <li><strong>The "Viral" Strategy:</strong> Low Dev Buy, High Pump Wallets (20+). Creates massive transaction count/green candles.</li>
+                                <li><strong>Dev Buy:</strong> The supply you lock up. High % = Trust.</li>
+                                <li><strong>Pump Amount:</strong> The SOL scattered across burner wallets to create volume.</li>
+                                <li><strong>Profiles:</strong> 
+                                    <br> - <em>Fixed:</em> Equal buys. Good for stability.
+                                    <br> - <em>Random:</em> Varied buys. Mimics organic "fomo" traders.
+                                </li>
                             </ul>
                         </div>
                         <div class="step-visual">
-                            <!-- CSS Mock UI: Sliders -->
                             <div class="mock-slider-group">
                                 <div class="mock-label-row"><div class="mock-line"></div><div class="mock-val"></div></div>
                                 <div class="mock-slider-track"><div class="mock-slider-fill" style="width: 70%"></div></div>
@@ -3339,21 +3298,25 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Step 4 -->
+                
+                    <!-- Step 4: Advanced Protocols (Ghost/Dip) -->
                     <div class="step-card reverse">
                         <div class="step-text">
-                            <div class="step-badge">04</div>
-                            <h3>Automated Execution</h3>
+                            <div class="step-badge">Phase 4</div>
+                            <h3>Stealth & Defense Protocols</h3>
                             <p>
-                                Click "Create & Launch". Our system takes over:
-                                <br>1. Generates and funds the burner wallets.
-                                <br>2. Deploys the contract.
-                                <br>3. Bundles the buy orders into a single atomic block.
+                                Activate <strong>Ghost Protocol</strong> to obfuscate the link between your burner wallets and the Dev Wallet. 
+                                This makes your launch look like a community effort, not a developer pump.
                             </p>
+                            <div class="pro-tip-box">
+                                <div class="pro-tip-header">
+                                    <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#icon-check-circle"></use></svg>
+                                    The "Dip Buyer" Edge
+                                </div>
+                                <p>Enable the <strong>Dip Buyer AI</strong> to reserve 2-3 wallets. The system will automatically execute buys if the price drops by your set percentage (e.g., -15%), protecting your chart from early jeets.</p>
+                            </div>
                         </div>
                         <div class="step-visual">
-                            <!-- CSS Mock UI: Loading/Chart -->
                             <div class="mock-chart">
                                 <div class="mock-candle c1"></div>
                                 <div class="mock-candle c2"></div>
@@ -3363,28 +3326,31 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Step 5: Post-Launch Control (ADD THIS ENTIRE BLOCK) -->
+                
+                    <!-- Step 5: Post-Launch -->
                     <div class="step-card">
                         <div class="step-text">
-                            <div class="step-badge">05</div>
+                            <div class="step-badge">Phase 5</div>
                             <h3>Manual Command & Control</h3>
                             <p>
-                                Once the automated launch completes, the <strong>Manual Control Panel</strong> appears. This is your command center for managing post-launch momentum.
+                                Once deployed, you enter the <strong>Command Center</strong>. Here, you control the momentum.
                             </p>
                             <p>
-                                The primary tool is the <strong>Pump Wallet</strong> button. Each click executes one buy transaction from your pre-funded wallets.
+                                Use the <strong>"Pump Wallet"</strong> button to execute single, strategic buy orders from your remaining reserves. 
+                                Time these buys to break resistance levels or recover from a dip.
                             </p>
-                            <div class="strategy-tip">
-                                <svg class="icon"><use xlink:href="#icon-info-circle"></use></svg>
-                                <span><strong>Strategy Tip:</strong> Don't spam the button. Watch the live chart. Wait for a small dip, then pump to create a new price floor. Or, pump during an uptrend to break through resistance and trigger FOMO.</span>
+                            <div class="pro-tip-box">
+                                <div class="pro-tip-header">
+                                    <svg class="icon" style="width:16px;height:16px;"><use xlink:href="#icon-alert-triangle"></use></svg>
+                                    Exit Strategy
+                                </div>
+                                <p>Don't roundtrip your bags. Use the <strong>"Sell All"</strong> function only when you have achieved your target multiplier or reached King of the Hill.</p>
                             </div>
                         </div>
                         <div class="step-visual">
-                            <!-- CSS Mock UI: Manual Control Panel -->
                             <div class="mock-control-panel">
                                 <div class="mock-line" style="width: 50%; height: 10px; margin-bottom: 25px;"></div>
-                                <div class="mock-btn mock-pump-btn">Pump Wallet</div>
+                                <div class="mock-btn mock-pump-btn">Pump Wallet (1 Left)</div>
                                 <div class="mock-line" style="width: 40%; height: 6px; margin-top: 10px; background: #222;"></div>
                                 <div class="mock-sell-group">
                                     <div class="mock-btn mock-sell-btn dev">Sell Dev</div>
@@ -3393,7 +3359,7 @@
                             </div>
                         </div>
                     </div>
-
+                
                 </div>
             </main>
 
@@ -4088,18 +4054,32 @@
                 window.updateLogCount(savedLogs.length);
         
                 // Navigation
-                const navLinks = document.querySelectorAll(".nav-link, .footer-nav-link, #logo-link");
+                // Navigation - Fixed Active Tab Sync
+                const navLinks = document.querySelectorAll(".nav-link, .footer-nav-link, #logo-link, .section-footer-link");
                 const sections = document.querySelectorAll(".page-section");
+        
                 navLinks.forEach(link => {
                     link.onclick = (e) => {
                         e.preventDefault();
                         let pageId = link.getAttribute("data-page");
                         if (link.id === "logo-link") pageId = "create-coin-section";
+        
+                        // 1. Switch the visible content section
                         sections.forEach(s => s.classList.remove("active"));
                         const target = document.getElementById(pageId);
-                        if(target) target.classList.add("active");
+                        if (target) target.classList.add("active");
+        
+                        // 2. Update the Header Navigation Bar
+                        // First, remove the green underline from ALL header links
                         document.querySelectorAll(".nav-link").forEach(n => n.classList.remove("active-nav"));
-                        if(link.classList.contains("nav-link")) link.classList.add("active-nav");
+        
+                        // Then, find the specific header link that corresponds to the page we just opened
+                        const correspondingHeaderLink = document.querySelector(`.nav-link[data-page="${pageId}"]`);
+                        if (correspondingHeaderLink) {
+                            correspondingHeaderLink.classList.add("active-nav");
+                        }
+        
+                        // 3. Close mobile menus if open
                         document.getElementById("main-nav").classList.remove("mobile-open");
                         document.getElementById("mobile-menu-toggle").classList.remove("open");
                         window.scrollTo(0, 0);
@@ -4399,16 +4379,29 @@
                     };
                 }
                 
-                // Inputs & Validation
-                function checkLaunchReadiness() {
-                    if (loadingModal.style.display === 'flex') return;
+                // Inputs & Validation & Preview Updates
+                function updateUI() {
+                    // 1. Get Values
                     const nameVal = document.getElementById("coin-name").value.trim();
                     const tickerVal = document.getElementById("ticker").value.trim();
+                    const descVal = document.getElementById("description").value.trim();
                     const hasFile = document.getElementById("main-file-input").files.length > 0;
-                    createBtn.disabled = !(nameVal && tickerVal && hasFile);
+
+                    // 2. Update Preview Visuals (Live Feedback)
+                    document.getElementById("preview-name").textContent = nameVal || "Your Coin Name";
+                    document.getElementById("preview-ticker").textContent = tickerVal ? `$${tickerVal.toUpperCase()}` : "$TICKER";
+                    document.getElementById("preview-description").textContent = descVal || "A short, effective description of your coin will appear here once you start typing.";
+
+                    // 3. Validation State (Unlock Button)
+                    if (loadingModal.style.display !== 'flex') {
+                        createBtn.disabled = !(nameVal && tickerVal && hasFile);
+                    }
                 }
-                document.getElementById("coin-name").addEventListener("input", checkLaunchReadiness);
-                document.getElementById("ticker").addEventListener("input", checkLaunchReadiness);
+
+                // Bind the listeners to the new consolidated function
+                document.getElementById("coin-name").addEventListener("input", updateUI);
+                document.getElementById("ticker").addEventListener("input", updateUI);
+                document.getElementById("description").addEventListener("input", updateUI);
                 const uploader = document.getElementById("main-uploader");
                 const fileInput = document.getElementById("main-file-input");
                 uploader.onclick = () => fileInput.click();
