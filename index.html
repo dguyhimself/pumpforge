@@ -2545,67 +2545,56 @@
                 border-color: var(--accent-green);
                 color: var(--text-primary);
             }
-                        /* --- DISTRIBUTION SIMULATION STYLES --- */
-            #distribution-simulation {
-                display: none; /* Hidden by default */
+            /* --- DISTRIBUTION VISUALIZER STYLES --- */
+            .distribution-container {
                 background-color: #0a0a0a;
                 border: 1px solid var(--border-color);
                 border-radius: 8px;
                 margin-top: 16px;
-                max-height: 200px;
+                padding: 16px;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .dist-header {
+                display: flex;
+                justify-content: space-between;
+                font-size: 0.85rem;
+                color: var(--text-tertiary);
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 4px;
+            }
+
+            .wallet-list {
+                max-height: 180px; /* Scrollable area */
                 overflow-y: auto;
-                padding: 12px;
-            }
-            #distribution-simulation.active {
-                display: block;
-                animation: fadeIn 0.3s ease;
-            }
-
-            /* Custom Scrollbar for the list */
-            #distribution-simulation::-webkit-scrollbar {
-                width: 6px;
-            }
-            #distribution-simulation::-webkit-scrollbar-track {
-                background: #0a0a0a; 
-            }
-            #distribution-simulation::-webkit-scrollbar-thumb {
-                background: #333; 
-                border-radius: 3px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                padding-right: 8px; /* Space for scrollbar */
             }
 
-            .sim-row {
+            /* Custom Scrollbar */
+            .wallet-list::-webkit-scrollbar { width: 4px; }
+            .wallet-list::-webkit-scrollbar-track { background: #111; }
+            .wallet-list::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+            .wallet-row {
                 display: flex;
                 align-items: center;
-                justify-content: space-between;
-                padding: 6px 8px;
-                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                gap: 12px;
+                font-family: "Courier New", monospace; /* Tech feel */
                 font-size: 0.85rem;
             }
-            .sim-row:last-child {
-                border-bottom: none;
-            }
-            .sim-wallet-id {
-                color: var(--text-tertiary);
-                font-family: monospace;
-            }
-            .sim-amount {
-                color: var(--accent-green);
-                font-weight: 600;
-                font-family: monospace;
-            }
-            .sim-visual-bar-container {
-                flex: 1;
-                margin: 0 16px;
-                height: 4px;
-                background: #222;
-                border-radius: 2px;
-                overflow: hidden;
-            }
-            .sim-visual-bar {
-                height: 100%;
-                background: var(--accent-green);
-                opacity: 0.7;
-            }
+
+            .w-id { color: var(--text-tertiary); width: 30px; }
+            .w-bar-container { flex: 1; height: 6px; background: #1a1a1a; border-radius: 3px; overflow: hidden; }
+            .w-bar { height: 100%; background: var(--accent-green); border-radius: 3px; transition: width 0.3s ease; }
+            .w-val { color: var(--text-primary); width: 70px; text-align: right; font-weight: 600; }
+                        
         </style>
     </head>
     <!-- Add this right before </body> -->
@@ -3015,16 +3004,38 @@
                                 <div class="input-helper">More wallets creates a more organic holder distribution.</div>
                             </div>
                         
-                            <div class="input-field" style="margin-top: 24px; margin-bottom: 15px;">
+                            <!-- REPLACED CONFIG SECTION -->
+                            <div class="input-field" style="margin-top: 24px; margin-bottom: 0;">
                                 <label>Pump Distribution Profile</label>
                                 <div class="pump-btn-group" id="profile-btn-group">
                                     <button class="btn active" data-profile="fixed">Fixed</button>
                                     <button class="btn" data-profile="random">Random</button>
                                 </div>
-                                <!-- This paragraph is populated by your JS script, as requested -->
-                                <p class="feature-description" id="profile-description"></p>
-                                <div id="distribution-simulation"></div>
+                                
+                                <!-- Dynamic Description Text -->
+                                <p class="feature-description" id="profile-description" style="min-height: 40px; margin-top: 12px;">
+                                    Uniform distribution ensures equal buy pressure across all nodes. Best for stability and calculating exact entry prices.
+                                </p>
+
+                                <!-- NEW: Distribution Visualizer -->
+                                <div class="distribution-container" id="dist-visualizer">
+                                    <div class="dist-header">
+                                        <span>Wallet ID</span>
+                                        <span>Allocation Load</span>
+                                        <span>Amount</span>
+                                    </div>
+                                    <div class="wallet-list" id="wallet-dist-list">
+                                        <!-- JS will inject rows here -->
+                                    </div>
+                                </div>
                             </div>
+
+                            <div class="summary-display" id="total-cost-display" style="margin-top: 20px;">
+                                <div class="summary-row">
+                                    <span>Total Cost (Dev + Pump)</span><span id="total-cost-value">7.50 SOL</span>
+                                </div>
+                            </div>
+                            <!-- END REPLACEMENT -->
                         
                             <div class="summary-display" id="est-sol-per-wallet-display">
                                 <div class="summary-row">
@@ -4388,20 +4399,128 @@
                     { id: "dip-trigger-slider", valId: "dip-trigger-value", unit: "%", dec: 0 }
                 ];
         
+                // --- ADVANCED DISTRIBUTION ENGINE ---
+        
+                // 1. Math Helper: Gaussian Random (Organic Bell Curve)
+                function randomGaussian(mean, stdev) {
+                    const u = 1 - Math.random(); 
+                    const v = Math.random();
+                    const z = Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+                    return z * stdev + mean;
+                }
+        
+                // 2. Logic: Generate Distribution Array
+                function generateDistribution(totalSol, walletCount, isRandom) {
+                    let allocations = [];
+                    
+                    if (!isRandom) {
+                        // Fixed Profile
+                        const perWallet = totalSol / walletCount;
+                        allocations = new Array(walletCount).fill(perWallet);
+                    } else {
+                        // Random Profile (Organic)
+                        // We use weights first, then normalize to ensure Sum == TotalSol
+                        let weights = [];
+                        let totalWeight = 0;
+                        
+                        for(let i=0; i<walletCount; i++) {
+                            // Random factor between 0.2 and 1.8 of average
+                            let weight = Math.random() * (1.8 - 0.2) + 0.2; 
+                            weights.push(weight);
+                            totalWeight += weight;
+                        }
+                        
+                        // Normalize to match Total SOL
+                        allocations = weights.map(w => (w / totalWeight) * totalSol);
+                    }
+                    return allocations;
+                }
+        
+                // 3. UI: Render the Visualizer
                 function updateEstimates() {
-                    const wallets = parseInt(document.getElementById("pump-wallets-slider").value);
+                    // Get current inputs
+                    const walletCount = parseInt(document.getElementById("pump-wallets-slider").value);
                     const totalSol = parseFloat(document.getElementById("total-sol-slider").value);
                     const devSol = parseFloat(document.getElementById("dev-buy-slider").value);
+                    
+                    // Get Active Profile
+                    const activeBtn = document.querySelector("#profile-btn-group .btn.active");
+                    const isRandom = activeBtn && activeBtn.dataset.profile === 'random';
+        
+                    // Calculate Costs (Same as before)
                     let extraCost = 0.05; 
                     const firstMoverToggle = document.querySelector("#first-mover-module .adv-toggle");
                     if(firstMoverToggle && firstMoverToggle.checked) {
                         extraCost += parseFloat(document.getElementById("first-buy-sol-slider").value);
                     }
-                    const perWallet = wallets > 0 ? (totalSol / wallets).toFixed(3) : 0;
-                    document.getElementById("sol-per-wallet-value").textContent = `${perWallet} SOL`;
                     document.getElementById("total-cost-value").textContent = `${(devSol + totalSol + extraCost).toFixed(2)} SOL`;
+        
+                    // --- RENDER VISUALIZER ---
+                    const list = document.getElementById("wallet-dist-list");
+                    list.innerHTML = ""; // Clear current
+        
+                    const allocations = generateDistribution(totalSol, walletCount, isRandom);
+                    const maxVal = Math.max(...allocations); // For bar scaling
+        
+                    allocations.forEach((amount, index) => {
+                        const percent = (amount / maxVal) * 100;
+                        const row = document.createElement("div");
+                        row.className = "wallet-row";
+                        row.innerHTML = `
+                            <span class="w-id">#${index + 1}</span>
+                            <div class="w-bar-container">
+                                <div class="w-bar" style="width: ${percent}%; opacity: ${0.4 + (percent/200)}"></div>
+                            </div>
+                            <span class="w-val">${amount.toFixed(3)}</span>
+                        `;
+                        list.appendChild(row);
+                    });
                 }
         
+                // 4. Event Listeners
+                // Handle Profile Toggle Click
+                const profileBtnGroup = document.getElementById("profile-btn-group");
+                if(profileBtnGroup) {
+                    profileBtnGroup.onclick = (e) => {
+                        if(e.target.classList.contains("btn")) {
+                            // Update Active State
+                            document.querySelectorAll("#profile-btn-group .btn").forEach(b => b.classList.remove("active"));
+                            e.target.classList.add("active");
+                            
+                            // Update Text Description
+                            const profile = e.target.dataset.profile;
+                            const desc = document.getElementById("profile-description");
+                            
+                            if(profile === 'random') {
+                                desc.innerHTML = `<strong>Stochastic Mode Active:</strong> Applies variable weightings to each wallet. Mimics organic "FOMO" buying patterns to evade bubble-maps and tracker bots.`;
+                            } else {
+                                desc.textContent = "Uniform distribution ensures equal buy pressure across all nodes. Best for stability and calculating exact entry prices.";
+                            }
+                            
+                            // Re-render
+                            updateEstimates();
+                        }
+                    };
+                }
+        
+                // Re-bind Sliders to new update function
+                sliders.forEach(s => {
+                    const el = document.getElementById(s.id);
+                    const valEl = document.getElementById(s.valId);
+                    if(el && valEl) {
+                        el.oninput = () => {
+                            valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
+                            // Update gradient background
+                            const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
+                            el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
+                            // Update Math
+                            updateEstimates();
+                        };
+                    }
+                });
+                
+                // Initial Call
+                updateEstimates();
                 document.querySelectorAll(".adv-toggle").forEach(toggle => {
                     const module = toggle.closest(".adv-feature-module");
                     toggle.onchange = () => {
@@ -4410,21 +4529,7 @@
                     };
                     toggle.onchange(); 
                 });
-        
-                sliders.forEach(s => {
-                    const el = document.getElementById(s.id);
-                    const valEl = document.getElementById(s.valId);
-                    if(el && valEl) {
-                        el.oninput = () => {
-                            valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
-                            const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
-                            el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
-                            updateEstimates();
-                        };
-                        el.dispatchEvent(new Event("input"));
-                    }
-                });
-        
+ 
                 // Profile logic
                 const profileBtnGroup = document.getElementById("profile-btn-group");
                 if(profileBtnGroup) {
