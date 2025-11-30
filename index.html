@@ -4388,159 +4388,64 @@
                     { id: "dip-trigger-slider", valId: "dip-trigger-value", unit: "%", dec: 0 }
                 ];
         
-                // --- ADVANCED DISTRIBUTION LOGIC ---
-                function generateRandomWallets(totalSol, walletCount) {
-                    // Algorithm: Generate random weights -> Normalize -> Apply to Total
-                    let weights = [];
-                    let sum = 0;
-                    
-                    // 1. Generate Raw Weights
-                    for(let i=0; i<walletCount; i++) {
-                        const val = Math.random(); 
-                        weights.push(val);
-                        sum += val;
-                    }
-        
-                    // 2. Normalize and Distribute
-                    let distribution = weights.map(w => (w / sum) * totalSol);
-                    
-                    // 3. Fix Rounding errors on the last wallet
-                    const currentSum = distribution.reduce((a, b) => a + b, 0);
-                    const diff = totalSol - currentSum;
-                    distribution[distribution.length - 1] += diff;
-        
-                    return distribution;
-                }
-        
-                function renderSimulation(distribution) {
-                    const container = document.getElementById("distribution-simulation");
-                    container.innerHTML = ""; // Clear current
-                    
-                    // Find max for bar graph scaling
-                    const maxVal = Math.max(...distribution);
-        
-                    distribution.forEach((amt, index) => {
-                        const percentage = (amt / maxVal) * 100;
-                        const html = `
-                            <div class="sim-row">
-                                <span class="sim-wallet-id">Wallet #${String(index + 1).padStart(2, '0')}</span>
-                                <div class="sim-visual-bar-container">
-                                    <div class="sim-visual-bar" style="width: ${percentage}%"></div>
-                                </div>
-                                <span class="sim-amount">${amt.toFixed(4)} SOL</span>
-                            </div>
-                        `;
-                        container.innerHTML += html;
-                    });
-                }
-        
-                // --- UPDATED ESTIMATES & UI HANDLER ---
                 function updateEstimates() {
-                    // 1. Get Values
-                    const walletCount = parseInt(document.getElementById("pump-wallets-slider").value);
+                    const wallets = parseInt(document.getElementById("pump-wallets-slider").value);
                     const totalSol = parseFloat(document.getElementById("total-sol-slider").value);
                     const devSol = parseFloat(document.getElementById("dev-buy-slider").value);
-                    
-                    // 2. Calculate Costs
-                    let extraCost = 0.05; // Base fee buffer
+                    let extraCost = 0.05; 
                     const firstMoverToggle = document.querySelector("#first-mover-module .adv-toggle");
                     if(firstMoverToggle && firstMoverToggle.checked) {
                         extraCost += parseFloat(document.getElementById("first-buy-sol-slider").value);
                     }
-        
-                    // 3. Update Text Displays
-                    const perWalletFixed = walletCount > 0 ? (totalSol / walletCount).toFixed(3) : 0;
-                    document.getElementById("sol-per-wallet-value").textContent = `${perWalletFixed} SOL`;
+                    const perWallet = wallets > 0 ? (totalSol / wallets).toFixed(3) : 0;
+                    document.getElementById("sol-per-wallet-value").textContent = `${perWallet} SOL`;
                     document.getElementById("total-cost-value").textContent = `${(devSol + totalSol + extraCost).toFixed(2)} SOL`;
-        
-                    // 4. Handle Distribution Simulation
-                    const activeProfile = document.querySelector("#profile-btn-group .btn.active").dataset.profile;
-                    const simContainer = document.getElementById("distribution-simulation");
-                    const avgDisplay = document.getElementById("est-sol-per-wallet-display");
-        
-                    if (activeProfile === 'random' && walletCount > 0) {
-                        // Show Simulation
-                        simContainer.classList.add("active");
-                        avgDisplay.style.display = "none"; // Hide "Est per wallet" since it varies
-                        
-                        const distData = generateRandomWallets(totalSol, walletCount);
-                        renderSimulation(distData);
-                    } else {
-                        // Show Fixed
-                        simContainer.classList.remove("active");
-                        avgDisplay.style.display = "block";
-                    }
-                    // --- SLIDER EVENT LISTENERS (FIX) ---
-        // 1. Define the configuration for all sliders
-        const sliders = [
-            { id: "dev-buy-slider", valId: "dev-buy-value", unit: "SOL", dec: 1 },
-            { id: "total-sol-slider", valId: "sol-value", unit: "SOL", dec: 1 },
-            { id: "pump-wallets-slider", valId: "wallets-value", unit: "Wallets", dec: 0 },
-            { id: "first-buy-sol-slider", valId: "first-buy-sol-value", unit: "SOL", dec: 1 },
-            { id: "first-buy-delay-slider", valId: "first-buy-delay-value", unit: "sec", dec: 0 },
-            { id: "dip-wallets-slider", valId: "dip-wallets-value", unit: "Wallets", dec: 0 },
-            { id: "dip-trigger-slider", valId: "dip-trigger-value", unit: "%", dec: 0 }
-        ];
-
-        // 2. Attach the listeners to make them work
-        sliders.forEach(s => {
-            const el = document.getElementById(s.id);
-            const valEl = document.getElementById(s.valId);
-            if(el && valEl) {
-                el.oninput = () => {
-                    // Update the text number next to the slider
-                    valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
-                    
-                    // Update the green fill color of the slider track
-                    const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
-                    el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
-                    
-                    // Run the math + simulation
-                    updateEstimates();
-                };
-                // Trigger once immediately to set initial state
-                el.dispatchEvent(new Event("input"));
-            }
-        });
-        
-        // 3. Re-bind the Advanced Toggles
-        document.querySelectorAll(".adv-toggle").forEach(toggle => {
-            const module = toggle.closest(".adv-feature-module");
-            toggle.onchange = () => {
-                module.classList.toggle("disabled", !toggle.checked);
-                updateEstimates();
-            };
-            // Trigger initial state
-            toggle.dispatchEvent(new Event("change"));
-        });
                 }
-
+        
+                document.querySelectorAll(".adv-toggle").forEach(toggle => {
+                    const module = toggle.closest(".adv-feature-module");
+                    toggle.onchange = () => {
+                        module.classList.toggle("disabled", !toggle.checked);
+                        updateEstimates();
+                    };
+                    toggle.onchange(); 
+                });
+        
+                sliders.forEach(s => {
+                    const el = document.getElementById(s.id);
+                    const valEl = document.getElementById(s.valId);
+                    if(el && valEl) {
+                        el.oninput = () => {
+                            valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
+                            const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
+                            el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
+                            updateEstimates();
+                        };
+                        el.dispatchEvent(new Event("input"));
+                    }
+                });
+        
                 // Profile logic
-                // --- PROFILE BUTTON LOGIC ---
                 const profileBtnGroup = document.getElementById("profile-btn-group");
                 if(profileBtnGroup) {
                     profileBtnGroup.onclick = (e) => {
                         if(e.target.classList.contains("btn")) {
-                            // Toggle Active Class
                             document.querySelectorAll("#profile-btn-group .btn").forEach(b => b.classList.remove("active"));
                             e.target.classList.add("active");
-                            
-                            // Update Description & UI
                             const profile = e.target.dataset.profile;
                             const desc = document.getElementById("profile-description");
-                            
                             if(profile === 'random') {
-                                if(desc) desc.innerHTML = "<strong>Organic Simulation.</strong> Applies variance logic to mimic real buyer behavior. Wallets buy different amounts to create a natural, FOMO-inducing chart pattern.";
+                                 if(desc) desc.textContent = "Distributes the Total Pump Amount randomly across all pump wallets.";
+                                 document.getElementById("est-sol-per-wallet-display").style.display = "none";
                             } else {
-                                if(desc) desc.innerHTML = "<strong>Uniform Distribution.</strong> Every wallet buys the exact same amount. Creates a steady, artificial-looking step chart. Good for stability.";
+                                 if(desc) desc.textContent = "Distributes the Total Pump Amount evenly across all pump wallets.";
+                                 document.getElementById("est-sol-per-wallet-display").style.display = "block";
                             }
-                            
-                            updateEstimates(); // Re-render logic
+                            updateEstimates();
                         }
                     };
-                }        
- 
- 
+                }
+        
                 // --- LAUNCH LOGIC (RESTORED DYNAMIC ERRORS) ---
                 const createBtn = document.getElementById("create-coin-btn");
                 const loadingModal = document.getElementById("loading-modal");
